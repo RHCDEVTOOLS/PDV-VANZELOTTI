@@ -1311,7 +1311,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('table-number').addEventListener('change', (e) => {
         const tableNumber = e.target.value;
-        fetch(`functions.php?action=update_table&table=${tableNumber}`)
+        fetch(`functions.php?action=update_table_number&table=${tableNumber}`)
             .then(response => response.json())
             .then(data => {
                 if (data.status !== 'success') {

@@ -1,8 +1,8 @@
 <?php
-$host = 'localhost';
-$dbname = 'u693220259_pdv';
-$username = 'u693220259_pdvadm';
-$password = '6G&]N/vi~';
+$host = $_ENV['DB_HOST'] ?? getenv('DB_HOST');
+$dbname = $_ENV['DB_NAME'] ?? getenv('DB_NAME');
+$username = $_ENV['DB_USER'] ?? getenv('DB_USER');
+$password = $_ENV['DB_PASS'] ?? getenv('DB_PASS');
 
 try {
     $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);

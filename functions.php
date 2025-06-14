@@ -485,6 +485,67 @@ function getSale($conn, $saleId) {
     }
 }
 
+// Exportar vendas como CSV
+function exportSalesCSV($conn, $period, $payment, $startDate, $endDate) {
+    try {
+        $query = "SELECT s.id, s.date, s.table_number, s.payment_method, s.subtotal, s.service_tax, s.total, c.name AS customer_name, s.status FROM sales s LEFT JOIN customers c ON s.customer_id = c.id";
+        $conditions = [];
+        $params = [];
+
+        if ($period === 'today') {
+            $conditions[] = "DATE(s.date) = CURDATE()";
+        } elseif ($period === 'week') {
+            $conditions[] = "s.date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)";
+        } elseif ($period === 'month') {
+            $conditions[] = "s.date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
+        } elseif ($period === 'custom' && $startDate && $endDate) {
+            $conditions[] = "s.date BETWEEN ? AND ?";
+            $params[] = $startDate . ' 00:00:00';
+            $params[] = $endDate . ' 23:59:59';
+        }
+
+        if ($payment !== 'all') {
+            $conditions[] = "s.payment_method = ?";
+            $params[] = $payment;
+        }
+
+        if ($conditions) {
+            $query .= ' WHERE ' . implode(' AND ', $conditions);
+        }
+
+        $query .= ' ORDER BY s.date DESC';
+        $stmt = $conn->prepare($query);
+        $stmt->execute($params);
+        $sales = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename=sales_export.csv');
+
+        $output = fopen('php://output', 'w');
+        fputcsv($output, ['ID', 'Data', 'Mesa', 'Pagamento', 'Subtotal', 'Taxa Servico', 'Total', 'Cliente', 'Status']);
+        foreach ($sales as $sale) {
+            fputcsv($output, [
+                $sale['id'],
+                $sale['date'],
+                $sale['table_number'],
+                $sale['payment_method'],
+                number_format((float)$sale['subtotal'], 2, '.', ''),
+                number_format((float)$sale['service_tax'], 2, '.', ''),
+                number_format((float)$sale['total'], 2, '.', ''),
+                $sale['customer_name'],
+                $sale['status']
+            ]);
+        }
+        fclose($output);
+        exit;
+    } catch (PDOException $e) {
+        error_log('Erro em exportSalesCSV: ' . $e->getMessage());
+        http_response_code(500);
+        echo 'Erro ao exportar vendas';
+        exit;
+    }
+}
+
 // Atualizar resumo do pedido
 function updateOrderSummary($conn) {
     try {
@@ -644,6 +705,18 @@ if (isset($_GET['action']) || isset($_POST['action'])) {
 
         case 'save_settings':
             echo json_encode(saveSettings($conn, $_POST, $_FILES['restaurant_logo'] ?? null));
+            break;
+
+        case 'export_sales':
+            // Sobrescrever cabeçalhos JSON para saída CSV
+            header('Content-Type: text/csv; charset=utf-8');
+            exportSalesCSV(
+                $conn,
+                $_GET['period'] ?? 'today',
+                $_GET['payment'] ?? 'all',
+                $_GET['start_date'] ?? '',
+                $_GET['end_date'] ?? ''
+            );
             break;
 
         default:

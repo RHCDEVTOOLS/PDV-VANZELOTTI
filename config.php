@@ -1,8 +1,25 @@
 <?php
-$host = 'localhost';
-$dbname = 'u693220259_pdv';
-$username = 'u693220259_pdvadm';
-$password = '6G&]N/vi~';
+$host = getenv('DB_HOST');
+$dbname = getenv('DB_NAME');
+$username = getenv('DB_USER');
+$password = getenv('DB_PASS');
+
+if (!$host || !$dbname || !$username || $password === false) {
+    $configFile = __DIR__ . '/config.ini';
+    if (is_readable($configFile)) {
+        $config = parse_ini_file($configFile);
+        $host = $host ?: ($config['DB_HOST'] ?? null);
+        $dbname = $dbname ?: ($config['DB_NAME'] ?? null);
+        $username = $username ?: ($config['DB_USER'] ?? null);
+        if ($password === false || $password === null) {
+            $password = $config['DB_PASS'] ?? null;
+        }
+    }
+}
+
+if (!$host || !$dbname || !$username || $password === null || $password === false) {
+    die('Database configuration not provided.');
+}
 
 try {
     $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
@@ -32,4 +49,5 @@ if (!isset($_SESSION['current_order'])) {
         'change' => 0
     ];
 }
+
 ?>

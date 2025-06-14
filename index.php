@@ -5,7 +5,7 @@ require_once 'functions.php';
 
 if (!isset($_SESSION['current_order'])) {
     $_SESSION['current_order'] = [
-        'id' => generateOrderId(),
+        'id' => generateOrderId($conn),
         'table' => 1,
         'items' => [],
         'subtotal' => 0,
@@ -91,39 +91,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $response = ['status' => 'error', 'message' => 'Ação inválida'];
         switch ($_POST['action']) {
             case 'add_to_order':
-                if (addItemToOrder($_POST['item_id'])) {
+                if (addItemToOrder($conn, $_POST['item_id'])) {
                     $response = ['status' => 'success'];
                 } else {
                     $response['message'] = 'Erro ao adicionar item ao pedido';
                 }
                 break;
             case 'update_quantity':
-                if (updateItemQuantity($_POST['item_id'], $_POST['quantity'])) {
+                if (updateItemQuantity($conn, $_POST['item_id'], $_POST['quantity'])) {
                     $response = ['status' => 'success'];
                 } else {
                     $response['message'] = 'Erro ao atualizar quantidade';
                 }
                 break;
             case 'remove_item':
-                if (removeItemFromOrder($_POST['item_id'])) {
+                if (removeItemFromOrder($conn, $_POST['item_id'])) {
                     $response = ['status' => 'success'];
                 } else {
                     $response['message'] = 'Erro ao remover item';
                 }
                 break;
             case 'new_order':
-                createNewOrder();
+                createNewOrder($conn);
                 $response = ['status' => 'success', 'order_id' => $_SESSION['current_order']['id']];
                 break;
             case 'cancel_order':
-                createNewOrder();
+                createNewOrder($conn);
                 $response = ['status' => 'success', 'order_id' => $_SESSION['current_order']['id']];
                 break;
             case 'finish_order':
                 if (count($_SESSION['current_order']['items']) > 0) {
                     $saleId = saveSale($conn);
                     $_SESSION['last_sale_id'] = $saleId;
-                    createNewOrder();
+                    createNewOrder($conn);
                     $response = [
                         'status' => 'success',
                         'sale_id' => $saleId,

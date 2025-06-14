@@ -991,8 +991,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script>
         
-    function formatCurrency(value) {
+function formatCurrency(value) {
     return `R$ ${parseFloat(value).toFixed(2).replace('.', ',')}`;
+}
+
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str ?? '';
+    return div.innerHTML;
 }
 
 function debounce(func, wait) {
@@ -1070,7 +1076,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         itemDiv.dataset.id = item.id;
                         itemDiv.innerHTML = `
                             <div>
-                                <div class="line-clamp-1">${item.name}</div>
+                                <div class="line-clamp-1">${escapeHtml(item.name)}</div>
                                 <div class="text-sm opacity-70">R$ ${parseFloat(item.price).toFixed(2).replace('.', ',')}</div>
                             </div>
                             <div class="flex items-center">
@@ -1094,7 +1100,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'flex justify-between';
             itemDiv.innerHTML = `
-                <span>${item.quantity}x ${item.name}</span>
+                <span>${item.quantity}x ${escapeHtml(item.name)}</span>
                 <span>R$ ${(item.price * item.quantity).toFixed(2).replace('.', ',')}</span>`;
             receiptItemsDiv.appendChild(itemDiv);
         });
@@ -1393,10 +1399,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     itemDiv.className = 'menu-item bg-white bg-opacity-10 rounded-lg p-4 text-white flex flex-col items-center cursor-pointer transition-all hover:bg-opacity-20 btn-hover btn-active';
                     itemDiv.dataset.id = item.id;
                     itemDiv.setAttribute('role', 'button');
-                    itemDiv.setAttribute('aria-label', `Adicionar ${item.name} ao pedido`);
+                    itemDiv.setAttribute('aria-label', `Adicionar ${escapeHtml(item.name)} ao pedido`);
                     itemDiv.innerHTML = `
-                        <img src="${item.image ? 'Uploads/' + item.image : 'https://via.placeholder.com/100?text=Sem+Imagem'}" class="h-20 w-20 rounded object-cover mb-2" alt="${item.name}">
-                        <span class="text-sm font-medium text-center line-clamp-2">${item.name}</span>
+                        <img src="${item.image ? 'Uploads/' + item.image : 'https://via.placeholder.com/100?text=Sem+Imagem'}" class="h-20 w-20 rounded object-cover mb-2" alt="${escapeHtml(item.name)}">
+                        <span class="text-sm font-medium text-center line-clamp-2">${escapeHtml(item.name)}</span>
                         <span class="text-xs mt-1">R$ ${parseFloat(item.price).toFixed(2).replace('.', ',')}</span>`;
                     menuItemsDiv.appendChild(itemDiv);
                 });
@@ -1493,10 +1499,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td class="py-2">
-                            <img src="${item.image ? 'Uploads/' + item.image : 'https://via.placeholder.com/50?text=Sem+Imagem'}" class="h-10 w-10 rounded object-cover" alt="${item.name}">
+                            <img src="${item.image ? 'Uploads/' + item.image : 'https://via.placeholder.com/50?text=Sem+Imagem'}" class="h-10 w-10 rounded object-cover" alt="${escapeHtml(item.name)}">
                         </td>
-                        <td class="py-2">${item.name}</td>
-                        <td class="py-2">${item.category}</td>
+                        <td class="py-2">${escapeHtml(item.name)}</td>
+                        <td class="py-2">${escapeHtml(item.category)}</td>
                         <td class="py-2">R$ ${parseFloat(item.price).toFixed(2).replace('.', ',')}</td>
                         <td class="py-2">${item.status === 'active' ? 'Ativo' : 'Inativo'}</td>
                         <td class="py-2 text-right">
@@ -1644,10 +1650,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 customers.forEach(customer => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td class="py-2">${customer.name}</td>
-                        <td class="py-2">${customer.phone}</td>
-                        <td class="py-2">${customer.email || '-'}</td>
-                        <td class="py-2">${customer.address ? customer.address.substring(0, 30) + (customer.address.length > 30 ? '...' : '') : '-'}</td>
+                        <td class="py-2">${escapeHtml(customer.name)}</td>
+                        <td class="py-2">${escapeHtml(customer.phone)}</td>
+                        <td class="py-2">${customer.email ? escapeHtml(customer.email) : '-'}</td>
+                        <td class="py-2">${customer.address ? escapeHtml(customer.address.substring(0, 30) + (customer.address.length > 30 ? '...' : '')) : '-'}</td>
                         <td class="py-2">${customer.status === 'active' ? 'Ativo' : 'Inativo'}</td>
                         <td class="py-2 text-right">
                             <button class="edit-customer-btn bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded mr-1" data-id="${customer.id}" aria-label="Editar cliente"><i class="fas fa-edit"></i></button>
@@ -1773,7 +1779,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         document.getElementById('modal-order-number').textContent = String(sale.id).padStart(4, '0');
                         document.getElementById('modal-order-items').innerHTML = sale.items.map(item => `
                             <div class="flex justify-between text-white mb-1">
-                                <span>${item.quantity}x ${item.name}</span>
+                                <span>${item.quantity}x ${escapeHtml(item.name)}</span>
                                 <span>R$ ${(item.price * item.quantity).toFixed(2).replace('.', ',')}</span>
                             </div>`).join('');
                         document.getElementById('modal-subtotal').textContent = formatCurrency(sale.subtotal);
@@ -1873,9 +1879,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     sale.items.forEach(item => {
                         const itemDiv = document.createElement('div');
                         itemDiv.className = 'flex justify-between';
-                        itemDiv.innerHTML = `
-                            <span>${item.quantity}x ${item.name}</span>
-                            <span>R$ ${(parseFloat(item.price) * parseInt(item.quantity)).toFixed(2).replace('.', ',')}</span>`;
+                            itemDiv.innerHTML = `
+                                <span>${item.quantity}x ${escapeHtml(item.name)}</span>
+                                <span>R$ ${(parseFloat(item.price) * parseInt(item.quantity)).toFixed(2).replace('.', ',')}</span>`;
                         receiptItemsDiv.appendChild(itemDiv);
                     });
                 } else {
@@ -1909,8 +1915,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         })
                         .then(customer => {
                             document.getElementById('receipt-customer-info').innerHTML = `
-                                Cliente: ${customer.name || 'Não especificado'}<br>
-                                Endereço: ${customer.address || 'Não informado'}`;
+                                Cliente: ${customer.name ? escapeHtml(customer.name) : 'Não especificado'}<br>
+                                Endereço: ${customer.address ? escapeHtml(customer.address) : 'Não informado'}`;
                             // Atraso para garantir atualização do DOM
                             setTimeout(() => {
                                 window.print();

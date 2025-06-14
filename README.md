@@ -43,3 +43,6 @@ php -S localhost:8000
 
 3. Open `http://localhost:8000/index.php` in your browser.
 
+
+## Uploads Directory
+The `Uploads/` folder must be writable by the web server.

@@ -1,0 +1,10 @@
+# Ignore log files
+*.log
+php_errors.log
+error.log
+
+# Ignore uploads directory
+Uploads/
+
+# Ignore other temporary files
+*.tmp

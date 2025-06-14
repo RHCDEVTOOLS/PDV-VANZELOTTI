@@ -1,0 +1,69 @@
+.glass {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+.btn-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-active:active {
+    transform: translateY(0);
+}
+
+.category-active {
+    background-color: rgba(255, 255, 255, 0.3);
+    font-weight: bold;
+}
+
+.order-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.tab-active {
+    background-color: rgba(255, 255, 255, 0.3);
+    font-weight: bold;
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #receipt-print, #receipt-print * {
+        visibility: visible;
+    }
+    #receipt-print {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 58mm;
+        font-size: 12px;
+        padding: 5px;
+    }
+    .no-print {
+        display: none !important;
+    }
+}

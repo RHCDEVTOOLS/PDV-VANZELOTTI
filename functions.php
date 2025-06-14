@@ -1,6 +1,4 @@
 <?php
-session_start();
-
 // Habilitar depuração (remover em produção)
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 1);

@@ -1,0 +1,4 @@
+config.ini
+php_errors.log
+error.log
+*.bak

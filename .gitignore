@@ -1,0 +1,4 @@
+php_errors.log
+error.log
+Uploads/
+.env

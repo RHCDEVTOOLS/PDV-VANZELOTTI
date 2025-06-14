@@ -1951,7 +1951,28 @@ document.addEventListener('DOMContentLoaded', () => {
         const payment = document.getElementById('sales-payment-filter').value;
         const startDate = document.getElementById('sales-start-date').value;
         const endDate = document.getElementById('sales-end-date').value;
-        window.location.href = `functions.php?action=export_sales&period=${period}&payment=${payment}&start_date=${startDate}&end_date=${end_date}`;
+        const btn = document.getElementById('export-sales-btn');
+        showLoading(btn);
+        const url = `functions.php?action=export_sales&period=${period}&payment=${payment}&start_date=${startDate}&end_date=${endDate}`;
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                hideLoading(btn);
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = 'sales_export.csv';
+                link.click();
+                alert('Exportação concluída!');
+            })
+            .catch(err => {
+                hideLoading(btn);
+                alert(`Erro ao exportar vendas: ${err.message}`);
+            });
     });
 
     document.getElementById('upload-logo-btn').addEventListener('click', () => {
